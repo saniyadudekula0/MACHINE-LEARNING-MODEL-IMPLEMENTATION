@@ -1,0 +1,72 @@
+# Spam Email Detection using Machine Learning (Single Python Script)
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.metrics import accuracy_score, classification_report
+
+# -----------------------------
+# STEP 1: CREATE DATASET
+# -----------------------------
+
+data = {
+    "message": [
+        "Win money now",
+        "Hello friend how are you",
+        "Claim your free prize",
+        "Let us meet tomorrow",
+        "Congratulations you won a lottery",
+        "Are we still on for dinner"
+    ],
+    "label": ["spam", "ham", "spam", "ham", "spam", "ham"]
+}
+
+df = pd.DataFrame(data)
+
+# -----------------------------
+# STEP 2: DATA PREPROCESSING
+# -----------------------------
+
+X = df["message"]
+y = df["label"]
+
+vectorizer = CountVectorizer()
+X_vectorized = vectorizer.fit_transform(X)
+
+# -----------------------------
+# STEP 3: TRAIN-TEST SPLIT
+# -----------------------------
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X_vectorized, y, test_size=0.3, random_state=42
+)
+
+# -----------------------------
+# STEP 4: MODEL TRAINING
+# -----------------------------
+
+model = MultinomialNB()
+model.fit(X_train, y_train)
+
+# -----------------------------
+# STEP 5: MODEL EVALUATION
+# -----------------------------
+
+y_pred = model.predict(X_test)
+
+print("Model Evaluation Results")
+print("------------------------")
+print("Accuracy:", accuracy_score(y_test, y_pred))
+print("\nClassification Report:\n")
+print(classification_report(y_test, y_pred))
+
+# -----------------------------
+# STEP 6: PREDICTION ON NEW DATA
+# -----------------------------
+
+new_email = ["Free money waiting for you"]
+new_email_vectorized = vectorizer.transform(new_email)
+prediction = model.predict(new_email_vectorized)
+
+print("New Email Prediction:", prediction[0])
